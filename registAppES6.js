@@ -1,3 +1,4 @@
+// Course class
 class Course{
     constructor(title, instructor, image){
         this.title = title;
@@ -6,6 +7,7 @@ class Course{
     }
 }
 
+// UI Class
 class UI{
     addCourseToList(course){
         const list = document.getElementById('course-list');
@@ -54,6 +56,41 @@ class UI{
 
 }
 
+class Storage{
+
+    static getCourses(){
+        let courses;
+
+        if (localStorage.getItem('courses')===null){
+            courses = [];
+        }else{
+            courses = JSON.parse(localStorage.getItem('courses'));
+        }
+        return courses;
+    }
+
+    static displayCourses(){
+        const courses = Storage.getCourses();
+
+        courses.forEach(course => {
+            const ui = new UI();
+            ui.addCourseToList(course);        
+        });
+    }
+
+    static addCourse(course){
+        const courses = Storage.getCourses();
+        courses.push(course);
+        localStorage.setItem('courses', JSON.stringify(courses)); //localStorage.setItem(keyname, value)
+    }
+
+    static deleteCourse(){
+
+    }
+}
+
+document.addEventListener('DOMContentLoaded', Storage.displayCourses);
+
 document.getElementById('new-course').addEventListener('submit', function(e){
 
     const title = document.getElementById('title').value;
@@ -73,6 +110,9 @@ document.getElementById('new-course').addEventListener('submit', function(e){
         // Add to Course List
         ui.addCourseToList(course);
 
+        // Save to Local Storage
+        Storage.addCourse(course);
+
         // Clear Controls
         ui.clearControls();
 
@@ -86,6 +126,12 @@ document.getElementById('new-course').addEventListener('submit', function(e){
 document.getElementById('course-list').addEventListener('click', function(e){
     //console.log(e.target);
     const ui = new UI();
+
+    // Delete Course from UI
     ui.deleteCourse(e.target);
+
+    // Delete Course from Local Storage
+    Storage.deleteCourse();
+
     ui.showAlert('The course has been deleted', 'danger');
 });
