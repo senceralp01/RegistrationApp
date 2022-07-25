@@ -1,6 +1,7 @@
 // Course class
 class Course{
     constructor(title, instructor, image){
+        this.courseId = Math.floor(Math.random()*10000); // Local storage'dan doğru bilgiyi seçip silebilmemiz için üretildi.
         this.title = title;
         this.instructor = instructor;
         this.image = image;
@@ -17,7 +18,7 @@ class UI{
                 <td><img src="img/${course.image}" /></td>
                 <td>${course.title}</td>
                 <td>${course.instructor}</td>
-                <td><a href="#" class="btn btn-danger btn-sm delete">Delete</a></td>
+                <td><a href="#" data-id = "${course.courseId}" class="btn btn-danger btn-sm delete">Delete</a></td>
     
             </tr>
         
@@ -56,6 +57,7 @@ class UI{
 
 }
 
+// Local Storage Processes
 class Storage{
 
     static getCourses(){
@@ -84,13 +86,29 @@ class Storage{
         localStorage.setItem('courses', JSON.stringify(courses)); //localStorage.setItem(keyname, value)
     }
 
-    static deleteCourse(){
+    static deleteCourse(element){
+        if(element.classList.contains('delete')){
+            const id = element.getAttribute('data-id');
+            console.log(id);
 
+            const courses = Storage.getCourses();
+
+            courses.forEach((course, index)=>{
+
+                if (course.courseId == id){
+                    courses.splice(index,1);
+                }
+            })
+
+            localStorage.setItem('courses', JSON.stringify(courses));
+        }
     }
 }
 
+// Showing Datas from the Local Storage on UI when the DOM loaded
 document.addEventListener('DOMContentLoaded', Storage.displayCourses);
 
+// Adding New Course
 document.getElementById('new-course').addEventListener('submit', function(e){
 
     const title = document.getElementById('title').value;
@@ -122,7 +140,7 @@ document.getElementById('new-course').addEventListener('submit', function(e){
     e.preventDefault();
 });
 
-
+// Deleting a Course
 document.getElementById('course-list').addEventListener('click', function(e){
     //console.log(e.target);
     const ui = new UI();
@@ -131,7 +149,7 @@ document.getElementById('course-list').addEventListener('click', function(e){
     ui.deleteCourse(e.target);
 
     // Delete Course from Local Storage
-    Storage.deleteCourse();
+    Storage.deleteCourse(e.target);
 
     ui.showAlert('The course has been deleted', 'danger');
 });
