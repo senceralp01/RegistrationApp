@@ -36,6 +36,7 @@ class UI{
     deleteCourse(element){
         if (element.classList.contains('delete')){
             element.parentElement.parentElement.remove();
+            return true; // delete alerti için eklendi.
         }
     }
 
@@ -145,11 +146,12 @@ document.getElementById('course-list').addEventListener('click', function(e){
     //console.log(e.target);
     const ui = new UI();
 
-    // Delete Course from UI
-    ui.deleteCourse(e.target);
+    if(ui.deleteCourse(e.target)==true){ // Delete Course from UI and if deleted return true
+        
+        // Delete Course from Local Storage
+        Storage.deleteCourse(e.target);
 
-    // Delete Course from Local Storage
-    Storage.deleteCourse(e.target);
+        ui.showAlert('The course has been deleted', 'danger');
+    }
 
-    ui.showAlert('The course has been deleted', 'danger');
 });
